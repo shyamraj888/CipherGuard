@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useInView } from "framer-motion";
+import LiveCyberFeed from "./components/LiveCyberFeed";
 import { 
   Shield, 
   Menu, 
@@ -47,7 +48,7 @@ export default function CipherGuardPremiumLandingPage() {
         <TrustStats />
         <Features />
         <HowItWorks />
-        <LiveDemo />
+        <LiveCyberFeed />
         <Testimonials />
         <CTA />
       </main>
@@ -466,143 +467,7 @@ function HowItWorks() {
 // ============================================================================
 // 6. LIVE DEMO EXPERIENCE INTERFACE (PREMIUM LIVE STREAM UPDATER)
 // ============================================================================
-function LiveDemo() {
-  const [targetUrl, setTargetUrl] = useState("");
-  const [scanning, setScanning] = useState(false);
-  const [currentStep, setCurrentStep] = useState(0);
-  const [logs, setLogs] = useState<string[]>([]);
-  const [complete, setComplete] = useState(false);
-
-  const analysisPhases = [
-    { log: "Initializing Sandbox Container...", checkIndex: null },
-    { log: "Running SSL cryptographic verification algorithms...", checkIndex: 0 },
-    { log: "Evaluating core domain metadata registration lifetime...", checkIndex: 1 },
-    { log: "Cross-checking against global distributed block intelligence maps...", checkIndex: 2 },
-    { log: "Parsing UI DOM hierarchy for identity forgery configurations...", checkIndex: 3 },
-    { log: "Deconstructing active programmatic redirect vectors...", checkIndex: 4 },
-  ];
-
-  const handleScanSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!targetUrl.trim()) return;
-    
-    setScanning(true);
-    setComplete(false);
-    setCurrentStep(0);
-    setLogs([analysisPhases[0].log]);
-
-    // Fast pipeline update loops for high-end feel
-    let step = 0;
-    const interval = setInterval(() => {
-      step++;
-      if (step < analysisPhases.length) {
-        setCurrentStep(step);
-        setLogs(prev => [...prev, analysisPhases[step].log]);
-      } else {
-        clearInterval(interval);
-        setScanning(false);
-        setComplete(true);
-      }
-    }, 600);
-  };
-
-  return (
-    <section id="demo" className="mx-auto max-w-4xl px-4 py-20 sm:px-6 lg:px-8 space-y-10">
-      <div className="text-center space-y-2">
-        <h2 className="text-xs font-semibold uppercase tracking-widest text-blue-500">Interactive Sandbox</h2>
-        <p className="text-3xl font-bold tracking-tight text-white">Simulate Live Endpoint Inspection</p>
-        <p className="text-gray-400 text-sm max-w-md mx-auto">Input suspicious URL structures to watch real-time parallel detection calculations process.</p>
-      </div>
-
-      <div className="rounded-xl border border-gray-800 bg-[#111827]/90 p-6 shadow-2xl relative backdrop-blur-xl">
-        <form onSubmit={handleScanSubmit} className="flex flex-col sm:flex-row gap-3">
-          <div className="relative flex-1">
-            <Search className="absolute left-3.5 top-3.5 h-4 w-4 text-gray-500" />
-            <input
-              type="text"
-              value={targetUrl}
-              onChange={(e) => setTargetUrl(e.target.value)}
-              placeholder="Paste suspicious target URL here... (e.g., login-security-alert.org)"
-              className="w-full rounded-md border border-gray-800 bg-[#0B1120] py-3 pl-10 pr-4 text-sm text-white placeholder-gray-500 outline-none transition-all focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50"
-            />
-          </div>
-          <button
-            type="submit"
-            disabled={scanning}
-            className="flex items-center justify-center gap-2 rounded-md bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-md transition-all hover:bg-blue-500 disabled:opacity-60 min-w-[140px] cursor-pointer"
-          >
-            {scanning ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Parsing...
-              </>
-            ) : (
-              "Analyze Vector"
-            )}
-          </button>
-        </form>
-
-        {/* Live Terminal Log Stream Display */}
-        {scanning && (
-          <motion.div 
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mt-6 p-4 rounded-lg bg-black/60 border border-gray-800 font-mono text-[11px] text-gray-400 space-y-1.5"
-          >
-            <div className="flex items-center gap-2 text-blue-400 font-bold border-b border-gray-800/60 pb-1.5 mb-2">
-              <Terminal className="h-3.5 w-3.5" />
-              <span>LIVE ANALYSIS LOG TELEMETRY STREAM</span>
-            </div>
-            {logs.map((log, i) => (
-              <motion.div initial={{ opacity: 0, x: -5 }} animate={{ opacity: 1, x: 0 }} key={i} className="flex items-center gap-2">
-                <span className="text-gray-600">&gt;</span>
-                <span>{log}</span>
-              </motion.div>
-            ))}
-          </motion.div>
-        )}
-
-        {/* Final Risk Scoring Matrix Card */}
-        <AnimatePresence>
-          {complete && !scanning && (
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              className="mt-6 pt-6 border-t border-gray-800 grid grid-cols-1 md:grid-cols-3 gap-5"
-            >
-              <div className="rounded-lg border border-red-500/20 bg-red-500/5 p-4 flex flex-col items-center justify-center text-center">
-                <ShieldAlert className="h-7 w-7 text-red-500 mb-2" />
-                <span className="text-xs font-mono uppercase tracking-wider text-gray-400">Threat Index</span>
-                <span className="text-4xl font-black text-red-500 my-1">89%</span>
-                <span className="text-[10px] font-bold text-red-400 bg-red-500/10 px-2 py-0.5 rounded uppercase tracking-wide">HIGH CRITICAL RISK</span>
-              </div>
-
-              <div className="md:col-span-2 space-y-2 flex flex-col justify-center">
-                {[
-                  { check: "SSL Cryptographic Protocols Validation", status: true },
-                  { check: "Domain Registration Lifespan Verification", status: false },
-                  { check: "Global Threat Reputation Databases Cross Match", status: false },
-                  { check: "Suspicious Keyword Structural Pattern Detection", status: false },
-                  { check: "Active Programmatic Redirect Vector Evaluation", status: true }
-                ].map((item, idx) => (
-                  <div key={idx} className="flex items-center justify-between text-xs border-b border-gray-800/40 pb-2 last:border-0 last:pb-0">
-                    <span className="text-gray-300">{item.check}</span>
-                    {item.status ? (
-                      <span className="flex items-center gap-1 font-semibold text-emerald-500"><CheckCircle2 className="h-3.5 w-3.5" /> SECURE</span>
-                    ) : (
-                      <span className="flex items-center gap-1 font-semibold text-red-500"><AlertTriangle className="h-3.5 w-3.5" /> FAILED</span>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-    </section>
-  );
-}
+ <LiveCyberFeed />
 
 // ============================================================================
 // 7. TESTIMONIALS ARCHITECTURE
