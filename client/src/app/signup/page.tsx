@@ -6,6 +6,7 @@ import {
   Shield,
   Mail,
   Lock,
+  User,
   Eye,
   EyeOff,
   ArrowRight,
@@ -13,6 +14,7 @@ import {
   Activity,
   Loader2,
   CheckCircle2,
+  Check,
   Radar,
   Wifi
 } from "lucide-react";
@@ -27,9 +29,11 @@ interface Particle {
   size: number;
 }
 
-export default function CipherGuardLoginPage() {
+export default function CipherGuardSignupPage() {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [scanStage, setScanStage] = useState(0);
@@ -37,23 +41,30 @@ export default function CipherGuardLoginPage() {
   const [ticker, setTicker] = useState(0);
   const cardRef = useRef<HTMLDivElement | null>(null);
   const [mouse, setMouse] = useState({ x: 50, y: 50 });
-   
 
   const scanStages = [
-    "Validating credentials...",
-    "Checking device fingerprint...",
-    "Cross-referencing threat DB...",
-    "Establishing secure session...",
-    
+    "Creating your account...",
+    "Generating encryption keys...",
+    "Provisioning threat profile...",
+    "Syncing to threat intelligence mesh...",
+    "Account ready"
   ];
 
   const tickerFeed = [
-    "IP 41.203.x.x flagged 0.4s ago",
-    "New login pattern learned",
-    "12,847 sessions verified today",
-    "Zero anomalies in last 60s",
-    "Node latency 14ms"
+    "312 accounts provisioned today",
+    "Key exchange 14ms avg",
+    "Zero collisions in last 60s",
+    "New profile synced to mesh",
+    "Node latency 11ms"
   ];
+
+  const passwordChecks = [
+    { label: "8+ characters", pass: password.length >= 8 },
+    { label: "1 number", pass: /\d/.test(password) },
+    { label: "1 uppercase letter", pass: /[A-Z]/.test(password) }
+  ];
+
+  const passwordsMatch = confirmPassword.length > 0 && password === confirmPassword;
 
   useEffect(() => {
     const p = Array.from({ length: 18 }).map((_, i) => ({
@@ -215,7 +226,7 @@ export default function CipherGuardLoginPage() {
                   transition={{ repeat: Infinity, duration: 1.6 }}
                   className="h-2.5 w-2.5 rounded-full bg-green-500"
                 />
-                <span className="ml-3 text-[10px] font-mono text-gray-500 tracking-wider">AUTH_NODE_SECURE</span>
+                <span className="ml-3 text-[10px] font-mono text-gray-500 tracking-wider">REGISTER_NODE_SECURE</span>
               </div>
               <div className="flex items-center gap-2 rounded bg-gray-900 border border-gray-800 px-2 py-0.5 text-[10px] font-mono text-blue-400">
                 <motion.span
@@ -228,8 +239,8 @@ export default function CipherGuardLoginPage() {
             </div>
 
             <div className="relative space-y-1 mb-6">
-              <h1 className="text-2xl font-bold tracking-tight text-white">Sign in to your account</h1>
-              <p className="text-sm text-gray-400">Verify your identity to reach the threat console.</p>
+              <h1 className="text-2xl font-bold tracking-tight text-white">Create your account</h1>
+              <p className="text-sm text-gray-400">Join the threat console and start scanning in minutes.</p>
             </div>
 
             <AnimatePresence mode="wait">
@@ -240,6 +251,21 @@ export default function CipherGuardLoginPage() {
                   onSubmit={handleSubmit}
                   className="relative space-y-4"
                 >
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Full name</label>
+                    <div className="relative group">
+                      <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500 group-focus-within:text-blue-500 transition-colors" />
+                      <input
+                        type="text"
+                        required
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="Jane Cooper"
+                        className="w-full rounded-md bg-gray-900 border border-gray-800 py-2.5 pl-10 pr-3 text-sm text-white placeholder:text-gray-600 outline-none transition-all focus:border-blue-500/60 focus:ring-1 focus:ring-blue-500/30 focus:shadow-[0_0_20px_rgba(59,130,246,0.15)]"
+                      />
+                    </div>
+                  </div>
+
                   <div className="space-y-1.5">
                     <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Email</label>
                     <div className="relative group">
@@ -256,10 +282,7 @@ export default function CipherGuardLoginPage() {
                   </div>
 
                   <div className="space-y-1.5">
-                    <div className="flex items-center justify-between">
-                      <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Password</label>
-                      <a href="#" className="text-xs font-medium text-blue-500 hover:text-blue-400 transition-colors">Forgot?</a>
-                    </div>
+                    <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Password</label>
                     <div className="relative group">
                       <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500 group-focus-within:text-blue-500 transition-colors" />
                       <input
@@ -278,6 +301,57 @@ export default function CipherGuardLoginPage() {
                         {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </button>
                     </div>
+
+                    {password.length > 0 && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        className="flex flex-wrap gap-x-4 gap-y-1 pt-1"
+                      >
+                        {passwordChecks.map((check, idx) => (
+                          <div key={idx} className="flex items-center gap-1">
+                            {check.pass ? (
+                              <Check className="h-3 w-3 text-emerald-500" />
+                            ) : (
+                              <span className="h-3 w-3 rounded-full border border-gray-700" />
+                            )}
+                            <span className={`text-[10px] font-mono ${check.pass ? "text-emerald-500" : "text-gray-600"}`}>
+                              {check.label}
+                            </span>
+                          </div>
+                        ))}
+                      </motion.div>
+                    )}
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Confirm password</label>
+                    <div className="relative group">
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500 group-focus-within:text-blue-500 transition-colors" />
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        required
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        placeholder="••••••••••••"
+                        className={`w-full rounded-md bg-gray-900 border py-2.5 pl-10 pr-16 text-sm text-white placeholder:text-gray-600 outline-none transition-all focus:ring-1 ${
+                          confirmPassword.length > 0
+                            ? passwordsMatch
+                              ? "border-emerald-600/60 focus:border-emerald-500/60 focus:ring-emerald-500/30"
+                              : "border-red-600/60 focus:border-red-500/60 focus:ring-red-500/30"
+                            : "border-gray-800 focus:border-blue-500/60 focus:ring-blue-500/30"
+                        }`}
+                      />
+                      {confirmPassword.length > 0 && (
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2">
+                          {passwordsMatch ? (
+                            <Check className="h-4 w-4 text-emerald-500" />
+                          ) : (
+                            <span className="text-[10px] font-mono text-red-500">no match</span>
+                          )}
+                        </span>
+                      )}
+                    </div>
                   </div>
 
                   <div className="relative rounded-lg border border-gray-800 bg-[#0B1120]/60 px-3 py-2.5 flex items-center gap-2 overflow-hidden">
@@ -287,7 +361,7 @@ export default function CipherGuardLoginPage() {
                       className="absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-blue-500/10 to-transparent"
                     />
                     <Radar className="h-3.5 w-3.5 text-emerald-500 shrink-0 relative" />
-                    <span className="text-[11px] text-gray-400 relative">This session is being monitored by <span className="text-gray-300 font-medium">Threat Node #4471</span></span>
+                    <span className="text-[11px] text-gray-400 relative">Your data is encrypted with <span className="text-gray-300 font-medium">AES-256</span> at rest</span>
                   </div>
 
                   <button
@@ -299,12 +373,12 @@ export default function CipherGuardLoginPage() {
                       transition={{ repeat: Infinity, duration: 2.2, ease: "easeInOut", repeatDelay: 1 }}
                       className="absolute inset-y-0 w-1/4 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12"
                     />
-                    Sign in securely
+                    Create account
                     <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </button>
 
                   <p className="text-center text-xs text-gray-500 pt-2">
-                    Don't have an account? <a href="/signup" className="text-blue-500 hover:text-blue-400 font-medium transition-colors">Create one</a>
+                    Already have an account? <a href="/signin" className="text-blue-500 hover:text-blue-400 font-medium transition-colors">Sign in</a>
                   </p>
                 </motion.form>
               ) : (
