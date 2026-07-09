@@ -203,8 +203,8 @@ function Hero() {
           transition={{ delay: 0.3, duration: 0.5 }}
           className="flex flex-wrap gap-4 pt-2"
         >
-          <a href="#demo" className="group relative flex items-center gap-2 rounded-md bg-blue-600 px-6 py-3.5 text-sm font-semibold text-white shadow-xl shadow-blue-600/20 transition-all hover:bg-blue-500 hover:shadow-blue-600/30 active:scale-98">
-            Scan Now
+          <a href="/analyse" className="group relative flex items-center gap-2 rounded-md bg-blue-600 px-6 py-3.5 text-sm font-semibold text-white shadow-xl shadow-blue-600/20 transition-all hover:bg-blue-500 hover:shadow-blue-600/30 active:scale-98">
+            <span>Scan Now</span>
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
           </a>
           <a href="/dashboard" className="rounded-md border border-gray-800 bg-blue-900/40 px-6 py-3.5 text-sm font-semibold text-gray-300 transition-all hover:bg-gray-900 hover:text-white hover:border-gray-700">

@@ -258,7 +258,7 @@ export default function CipherGuardLoginPage() {
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between">
                       <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Password</label>
-                      <a href="#" className="text-xs font-medium text-blue-500 hover:text-blue-400 transition-colors">Forgot?</a>
+                      <a href="/forget" className="text-xs font-medium text-blue-500 hover:text-blue-400 transition-colors">Forgot?</a>
                     </div>
                     <div className="relative group">
                       <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500 group-focus-within:text-blue-500 transition-colors" />

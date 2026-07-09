@@ -24,7 +24,10 @@ import {
   CheckCircle2,
   AlertTriangle,
   RefreshCw,
-  Fingerprint
+  Fingerprint,
+  LogOut,
+  Menu,
+  X
 } from "lucide-react";
 
 type ScanType = "url" | "screenshot" | "message" | "email";
@@ -54,6 +57,7 @@ export default function HyperPremiumLiveScanPage() {
   const [scanProgress, setScanProgress] = useState(0);
   const [particles, setParticles] = useState<Particle[]>([]);
   const [systemStatus, setSystemStatus] = useState("OPTIMAL");
+  
 
   // Dynamic Mouse Spotlight Glow Effect for Premium Card Interactivity
   const mouseX = useMotionValue(0);
@@ -64,6 +68,26 @@ export default function HyperPremiumLiveScanPage() {
     mouseX.set(clientX - left);
     mouseY.set(clientY - top);
   }
+
+  
+  const [isOpen, setIsOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const navLinks = [
+    { name: "Dashboard", href: "/dashboard" },
+    { name: "Threat Vault", href: "/threat-history" },
+    { name: "Home", href: "/" },
+    { name: "Profile Node", href: "/profile" },
+    { name: "System Settings", href: "/settings" },
+  ];
+
+  
 
   // Generate continuous background system metrics noise
   useEffect(() => {
@@ -96,7 +120,7 @@ export default function HyperPremiumLiveScanPage() {
   });
 
   const inspectionTargetPipelines = [
-    { label: "Shagun is proper moti", engine: "OpenSSL Cluster Layer v3", status: "READY" },
+  
     { label: "Domain Reputation Index Tracking", engine: "WebRisk Core Matrix", status: "READY" },
     { label: "WHOIS Domain Registration Lifespan Analysis", engine: "MetaRegistry Synchronizer", status: "READY" },
     { label: "Active Dynamic Redirect Vector Trace", engine: "Chromium Headless Cluster", status: "READY" },
@@ -148,7 +172,91 @@ export default function HyperPremiumLiveScanPage() {
     }, 4300);
   };
 
+ 
+
   return (
+    <>
+     <motion.nav 
+      initial={{ y: -20, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      className={`sticky top-0 z-50 w-full border-b transition-all duration-300 ${
+        scrolled ? "border-gray-800/80 bg-[#0B1120]/80 backdrop-blur-md py-3" : "border-transparent bg-transparent py-5"
+      }`}
+    >
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex h-12 items-center justify-between">
+          <div className="flex items-center gap-2.5 cursor-pointer group">
+            <div className="relative">
+              <Shield className="h-6 w-6 text-blue-500 relative z-10 transition-transform duration-500 group-hover:rotate-12" fill="rgba(37, 99, 235, 0.1)" />
+              <div className="absolute -inset-1 bg-blue-500/30 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            </div>
+            <span className="text-lg font-bold tracking-tight text-white">
+              Cipher<span className="text-blue-500 transition-colors group-hover:text-blue-400">Guard</span>
+            </span>
+          </div>
+
+          <div className="hidden md:flex items-center gap-8">
+            {navLinks.map((link) => (
+              <a
+                key={link.name}
+                href={link.href}
+                className={`text-sm font-medium transition-colors hover:text-white relative group ${link.name === "Profile Node" ? "text-white" : "text-gray-400"}`}
+              >
+                {link.name}
+                <span className={`absolute -bottom-1 left-0 h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full ${link.name === "Profile Node" ? "w-full" : "w-0"}`} />
+              </a>
+            ))}
+          </div>
+
+          <div className="hidden md:flex items-center gap-4">
+            <div className="flex items-center gap-3 bg-[#111827]/60 border border-gray-800 px-3 py-1.5 rounded-md">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-xs font-mono text-gray-400">NODE_AUTH_OK</span>
+            </div>
+            <button className="p-2 rounded-md border border-gray-800 text-gray-400 hover:text-red-400 hover:bg-red-500/5 transition-all cursor-pointer">
+              <LogOut className="h-4 w-4" />
+            </button>
+          </div>
+
+          <div className="flex md:hidden">
+            <button onClick={() => setIsOpen(!isOpen)} className="text-gray-400 hover:text-white focus:outline-none cursor-pointer">
+              {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="md:hidden border-b border-gray-800 bg-[#0B1120]"
+          >
+            <div className="space-y-1 px-4 pb-4 pt-2">
+              {navLinks.map((link) => (
+                <a
+                  key={link.name}
+                  href={link.href}
+                  onClick={() => setIsOpen(false)}
+                  className="block rounded-md px-3 py-2 text-base font-medium text-gray-400 hover:bg-gray-900 hover:text-white"
+                >
+                  {link.name}
+                </a>
+              ))}
+              <div className="pt-4 border-t border-gray-800 flex flex-col gap-3">
+                <div className="flex items-center justify-center gap-3 bg-[#111827] border border-gray-800 py-2 rounded-md">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="text-xs font-mono text-gray-400">NODE_AUTH_OK</span>
+                </div>
+                <button className="w-full text-center py-2 text-sm font-medium text-red-400 border border-red-500/10 bg-red-500/5 rounded-md">Disconnect Node</button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.nav>
     <div 
       onMouseMove={handleMouseMove}
       className="min-h-screen bg-[#0B1120] text-[#F8FAFC] font-sans antialiased selection:bg-blue-500/30 overflow-x-hidden relative"
@@ -542,15 +650,7 @@ export default function HyperPremiumLiveScanPage() {
                 </div>
               </div>
 
-              <div className="rounded-lg bg-[#0B1120]/90 border border-gray-800/80 p-4 flex gap-3 relative overflow-hidden">
-                <Lock className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0 relative z-10" />
-                <div className="space-y-1 relative z-10">
-                  <h4 className="text-[11px] font-bold text-white uppercase tracking-wider font-mono">Confidential Shred Injunction</h4>
-                  <p className="text-xs text-gray-400 leading-relaxed font-medium">
-                    Input payloads processing loops occur entirely inside isolated memory registers. Contents are fully destroyed upon script execution complete loops.
-                  </p>
-                </div>
-              </div>
+              
             </div>
 
             {/* --- EXTREMELY PREMIUM INTERACTIVE ACTION BUTTON TRIGGER --- */}
@@ -580,55 +680,10 @@ export default function HyperPremiumLiveScanPage() {
           </div>
         </div>
 
-        {/* --- CONNECTED SYSTEM PIPELINE LOGIC ROADMAP --- */}
-        <section className="space-y-8 pt-6">
-          <div className="text-center max-w-xl mx-auto space-y-2">
-            <h2 className="text-xs font-bold uppercase tracking-widest text-blue-500 font-mono">FLOW ARCHITECTURE DIAGRAM</h2>
-            <p className="text-2xl font-black text-white tracking-tight">How CipherGuard Runs Core Threat Checks</p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 relative">
-            {[
-              { id: "Stage 01", title: "Upload Suspicious Content", desc: "Ingestion loops securely isolate input payloads directly within volatile transient micro-vault files.", icon: Upload },
-              { id: "Stage 02", title: "OCR & Security Engine", desc: "Vision nodes trace visual boundaries while advanced code structural parsing handles deep tracking loops.", icon: Eye },
-              { id: "Stage 03", title: "Threat Intelligence Analysis", desc: "Resulting telemetry maps trigger rapid lookups across federated decentralized defense indices globally.", icon: Cpu },
-              { id: "Stage 04", title: "AI Explanation & Risk Report", desc: "Generates clear plain-text executive risk readouts together with high-fidelity structural audit logs.", icon: Terminal }
-            ].map((step, idx) => {
-              const StepIcon = step.icon;
-              return (
-                <motion.div 
-                  key={idx} 
-                  className="relative group"
-                  initial={{ opacity: 0, y: 15 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: idx * 0.1 }}
-                >
-                  <div className="h-full rounded-xl border border-gray-800 bg-[#111827]/30 p-6 space-y-4 transition-all duration-300 group-hover:border-gray-700/80 group-hover:bg-[#111827]/50 relative overflow-hidden">
-                    <div className="flex justify-between items-start">
-                      <div className="p-2 rounded bg-[#0B1120] border border-gray-800 text-blue-500 transition-transform group-hover:scale-110">
-                        <StepIcon className="h-4 w-4" />
-                      </div>
-                      <span className="text-xs font-mono font-bold text-gray-600 group-hover:text-blue-500/50 transition-colors">{step.id}</span>
-                    </div>
-                    <div className="space-y-1.5">
-                      <h4 className="text-sm font-bold text-white tracking-tight">{step.title}</h4>
-                      <p className="text-xs text-gray-400 leading-relaxed font-medium">{step.desc}</p>
-                    </div>
-                  </div>
-
-                  {idx < 3 && (
-                    <div className="hidden lg:flex absolute top-1/2 -right-2.5 -translate-y-1/2 z-20 items-center justify-center bg-[#0B1120] border border-gray-800 rounded-full w-5 h-5 pointer-events-none">
-                      <ChevronRight className="h-3 w-3 text-gray-600 animate-pulse" />
-                    </div>
-                  )}
-                </motion.div>
-              );
-            })}
-          </div>
-        </section>
+       
         
       </div>
     </div>
+    </>
   );
 }
