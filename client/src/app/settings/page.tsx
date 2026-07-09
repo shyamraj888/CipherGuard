@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Shield,
@@ -38,10 +38,6 @@ import {
   X
 } from "lucide-react";
 
-// ────────────────────────────────────────────────────────
-// REUSABLE SUB-COMPONENTS
-// ────────────────────────────────────────────────────────
-
 interface ToggleProps {
   checked: boolean;
   onChange: (val: boolean) => void;
@@ -51,12 +47,19 @@ interface ToggleProps {
 
 const PremiumToggle: React.FC<ToggleProps> = ({ checked, onChange, label, description }) => {
   return (
-    <div className="flex items-center justify-between p-3.5 rounded-xl border border-gray-900 bg-[#050816]/60 backdrop-blur-md hover:border-gray-800 transition-all group">
-      <div className="space-y-0.5 max-w-[80%]">
-        <label className="text-xs font-bold font-mono text-white tracking-tight block cursor-pointer" onClick={() => onChange(!checked)}>
+    <div className="flex items-center justify-between p-4 rounded-xl border border-gray-900 bg-[#050816]/60 backdrop-blur-md hover:border-gray-800 transition-all group">
+      <div className="space-y-1 max-w-[80%]">
+        <label 
+          className="text-xs font-bold text-gray-200 tracking-wide font-sans block cursor-pointer group-hover:text-white transition-colors" 
+          onClick={() => onChange(!checked)}
+        >
           {label}
         </label>
-        {description && <p className="text-[11px] text-gray-500 font-medium leading-normal">{description}</p>}
+        {description && (
+          <p className="text-[11px] text-gray-500 font-sans font-medium leading-relaxed tracking-normal">
+            {description}
+          </p>
+        )}
       </div>
       <button
         type="button"
@@ -100,17 +103,19 @@ const SectionCard: React.FC<CardWrapperProps> = ({ title, subtitle, icon: Icon, 
         <div className={`p-2 rounded-xl bg-[#050816] border ${danger ? "border-red-500/20 text-red-400" : "border-gray-800 text-cyan-400"}`}>
           <Icon className="h-4 w-4" />
         </div>
-        <div>
-          <h3 className="text-sm font-bold text-white tracking-tight font-mono uppercase">{title}</h3>
-          <p className="text-xs text-gray-400 mt-0.5 font-medium">{subtitle}</p>
+        <div className="space-y-0.5">
+          <h3 className="text-xs font-bold text-white tracking-wider font-mono uppercase">
+            {title}
+          </h3>
+          <p className="text-[11px] text-gray-500 font-sans font-medium tracking-normal leading-normal">
+            {subtitle}
+          </p>
         </div>
       </div>
       {children}
     </motion.div>
   );
 };
-
-// ────────────────────────────────────────────────────────
 // MAIN CONFIGURATION ENGINE
 // ────────────────────────────────────────────────────────
 
@@ -119,6 +124,15 @@ export default function CipherGuardSettings() {
   const [searchFocused, setSearchFocused] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState<string | null>(null);
+  
+ const [showThemeNotice, setShowThemeNotice] = useState(false);
+
+ useEffect(() => {
+  if (showThemeNotice) {
+const timer = setTimeout(() => setShowThemeNotice(false), 3000);
+    return () => clearTimeout(timer);
+  }
+}, [showThemeNotice]);
 
   // Form State Vectors
   const [accountForm, setAccountForm] = useState({
@@ -459,119 +473,57 @@ export default function CipherGuardSettings() {
           ──────────────────────────────────────────────────────── */}
           <SectionCard title="Notification Subsystems" subtitle="Calibrate dispatch arrays for real-time telemetry drops" icon={Bell}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <PremiumToggle checked={notifSwitches.email} onChange={(v) => setNotifSwitches({ ...notifSwitches, email: v })} label="Global Email Dispatches" description="Comprehensive alert triggers sent to master inbox routing maps." />
-              <PremiumToggle checked={notifSwitches.threat} onChange={(v) => setNotifSwitches({ ...notifSwitches, threat: v })} label="Threat Detection Realtime Alerts" description="Dispatches critical red flags instantly upon execution trace identification." />
-              <PremiumToggle checked={notifSwitches.weekly} onChange={(v) => setNotifSwitches({ ...notifSwitches, weekly: v })} label="Weekly Aggregated Threat Summary" description="Compiles localized scan histories into a unified data vector layout every Sunday." />
-              <PremiumToggle checked={notifSwitches.updates} onChange={(v) => setNotifSwitches({ ...notifSwitches, updates: v })} label="Platform & Rules updates" description="Alerts when neural engine weights or core configurations cycle styles." />
-              <PremiumToggle checked={notifSwitches.marketing} onChange={(v) => setNotifSwitches({ ...notifSwitches, marketing: v })} label="Marketing Logs Ingestion" description="Optional analytical insight briefs regarding broad enterprise solutions." />
-              <PremiumToggle checked={notifSwitches.browser} onChange={(v) => setNotifSwitches({ ...notifSwitches, browser: v })} label="Browser Native Topmost Alerts" description="Pops non-blocking desktop toast modules for fast triage workflow loops." />
-              <PremiumToggle checked={notifSwitches.push} onChange={(v) => setNotifSwitches({ ...notifSwitches, push: v })} label="Mobile Push Perimeter Routing" description="Encrypts alert payloads directly to provisioned portable devices." />
+              <PremiumToggle checked={notifSwitches.email} onChange={(v) => setNotifSwitches({ ...notifSwitches, email: v })} label="Global Cybersecurity Alerts" description="Send you the latest cybersecurity updates and threat intelligence." />
+              <PremiumToggle checked={notifSwitches.push} onChange={(v) => setNotifSwitches({ ...notifSwitches, push: v })} label="Alert when someone also reports the same threat" description="Enable it for better protection" />
             </div>
           </SectionCard>
 
+{//section 5: APPEARANCE CONFIGURATIONS
+}        
+
+     <SectionCard title="Appearance Configurations" subtitle="Select your global infrastructure workspace interface skin" icon={Palette}>
+  <div className="font-mono text-xs max-w-md relative min-h-[115px]">
+    <div className="space-y-3">
+      <div className="flex justify-between items-center">
+        <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider block">
+          Master Theme Engine
+        </span>
+        <span className="text-[10px] font-bold text-gray-600 font-mono tracking-tight uppercase flex items-center gap-1">
+          ● Standard Dark Active
+        </span>
+      </div>
+      
+      <button
+        type="button"
+        onClick={() => setShowThemeNotice(true)}
+        className="w-full py-3 px-4 rounded-xl font-bold text-[10px] uppercase tracking-wider bg-[#050816] border border-gray-900 hover:border-gray-800 text-gray-400 hover:text-gray-200 transition-all flex items-center justify-between cursor-pointer group"
+      >
+        <span>Change Interface Theme</span>
+        <span className="text-[9px] bg-gray-950 border border-gray-900 px-2 py-0.5 rounded text-gray-500 group-hover:text-cyan-400 transition-colors">
+          COMING SOON
+        </span>
+      </button>
+
+      <p className="text-[11px] text-gray-500 font-sans font-medium mt-1 leading-normal">
+        Custom visual skins, high-contrast assets, and custom telemetry color mapping maps are currently restricted.
+      </p>
+    </div>
+
+    {showThemeNotice && (
+      <div className="absolute inset-0 bg-[#050816]/95 backdrop-blur-xs border border-cyan-500/20 rounded-xl flex items-center justify-center p-4 transition-all duration-200 ease-out">
+        <div className="text-center space-y-1">
+          <div className="text-cyan-400 font-bold text-[11px] uppercase tracking-widest animate-pulse">
+            System Notice
+          </div>
+          <p className="text-gray-400 text-[11px] font-sans font-medium">
+            This feature will be available in future updates.
+          </p>
+        </div>
+      </div>
+    )}
+  </div>
+</SectionCard>
         
-
-          {/* ────────────────────────────────────────────────────────
-              SECTION 6: INTERFACE VISUALS
-          ──────────────────────────────────────────────────────── */}
-          <SectionCard title="Appearance Configurations" subtitle="Adjust viewport metrics and telemetry color styling maps" icon={Palette}>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 font-mono text-xs mb-4">
-              <div className="space-y-1.5">
-                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider block">Master Theme State</span>
-                <div className="flex bg-[#050816] border border-gray-900 rounded-xl p-1 gap-1">
-                  {["Dark", "Light", "System"].map((t) => (
-                    <button
-                      key={t}
-                      type="button"
-                      onClick={() => setAppearance({ ...appearance, theme: t })}
-                      className={`flex-1 py-1.5 rounded-lg font-bold text-[10px] uppercase transition-all ${
-                        appearance.theme === t ? "bg-gray-800 text-white" : "text-gray-500 hover:text-gray-300"
-                      }`}
-                    >
-                      {t}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-1.5">
-                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider block">Accent Glow Spectrum</span>
-                <div className="flex bg-[#050816] border border-gray-900 rounded-xl p-1 gap-1">
-                  {["Cyan", "Blue", "Purple", "Green"].map((c) => (
-                    <button
-                      key={c}
-                      type="button"
-                      onClick={() => setAppearance({ ...appearance, accent: c })}
-                      className={`flex-1 py-1.5 rounded-lg font-bold text-[9px] uppercase transition-all ${
-                        appearance.accent === c ? "bg-cyan-500/10 border border-cyan-500/20 text-cyan-400" : "text-gray-500 hover:text-gray-300"
-                      }`}
-                    >
-                      {c}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-1.5">
-                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider block">Font Scale Array</span>
-                <div className="flex bg-[#050816] border border-gray-900 rounded-xl p-1 gap-1">
-                  {["Small", "Medium", "Large"].map((sz) => (
-                    <button
-                      key={sz}
-                      type="button"
-                      onClick={() => setAppearance({ ...appearance, fontSize: sz })}
-                      className={`flex-1 py-1.5 rounded-lg font-bold text-[10px] uppercase transition-all ${
-                        appearance.fontSize === sz ? "bg-gray-800 text-white" : "text-gray-500 hover:text-gray-300"
-                      }`}
-                    >
-                      {sz}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <PremiumToggle checked={appearance.animations} onChange={(v) => setAppearance({ ...appearance, animations: v })} label="Render UI Physics Animations" />
-              <PremiumToggle checked={appearance.glass} onChange={(v) => setAppearance({ ...appearance, glass: v })} label="Enforce Heavy Glass Blurs" />
-              <PremiumToggle checked={appearance.compact} onChange={(v) => setAppearance({ ...appearance, compact: v })} label="Enforce Dense Compact Grid" />
-            </div>
-          </SectionCard>
-
-          {/* ────────────────────────────────────────────────────────
-              SECTION 7: OPERATIONAL PRIVACY MATRIX
-          ──────────────────────────────────────────────────────── */}
-          <SectionCard title="Data Privacy Parameters" subtitle="Enforce governance standards over historical ingestion records" icon={Layers}>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 font-mono text-xs items-end">
-              <PremiumToggle checked={privacy.anonymous} onChange={(v) => setPrivacy({ ...privacy, anonymous: v })} label="Permit Anonymous Metadata Diagnostics" description="Scrubs identity variables before syncing logs to optimization targets." />
-              <PremiumToggle checked={privacy.storeHistory} onChange={(v) => setPrivacy({ ...privacy, storeHistory: v })} label="Persist Realtime Log History on Device" description="Caches trace indices within high-speed encrypted partitions." />
-            </div>
-
-            <div className="mt-4 pt-4 border-t border-gray-900/40 grid grid-cols-1 sm:grid-cols-3 gap-4 font-mono text-xs items-center">
-              <div className="space-y-1.5">
-                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider block">Auto-Purge Longevity Loop</span>
-                <select
-                  value={privacy.retention}
-                  onChange={(e) => setPrivacy({ ...privacy, retention: e.target.value })}
-                  className="w-full bg-[#050816] border border-gray-900 rounded-xl px-3.5 py-2.5 text-white outline-none focus:border-cyan-500/40 cursor-pointer text-xs"
-                >
-                  <option value="30 Days">Purge Automatically After 30 Days</option>
-                  <option value="60 Days">Purge Automatically After 60 Days</option>
-                  <option value="Never">Retain Permanently (Never Auto-Purge)</option>
-                </select>
-              </div>
-
-              <div className="sm:col-span-2 flex sm:justify-end gap-3 pt-3 sm:pt-0">
-                <button type="button" className="px-4 py-2.5 rounded-xl border border-gray-800 bg-gray-950 hover:border-gray-700 text-gray-300 font-bold transition-all cursor-pointer">
-                  Download All Accumulated Data
-                </button>
-                <button type="button" onClick={() => triggerModal("wipeHistory")} className="px-4 py-2.5 rounded-xl border border-red-900/30 bg-red-500/5 hover:bg-red-500/10 text-red-400 font-bold transition-all cursor-pointer">
-                  Wipe Scan History Arrays
-                </button>
-              </div>
-            </div>
-          </SectionCard>
-
           {/* ────────────────────────────────────────────────────────
               SECTION 8: FEDERATED INTEL PLUGINS
           ──────────────────────────────────────────────────────── */}
@@ -615,7 +567,7 @@ export default function CipherGuardSettings() {
           {/* ────────────────────────────────────────────────────────
               SECTION 9: DANGER DEPLOYMENT SECTOR
           ──────────────────────────────────────────────────────── */}
-          <SectionCard title="Danger Injunction Zone" subtitle="Destructive actions containing permanent instance structural override risks" icon={ShieldAlert} danger>
+          <SectionCard title="Danger Injunction Zone" subtitle="Destructive actions " icon={ShieldAlert} danger>
             <p className="text-xs text-red-400/80 leading-relaxed font-mono font-medium mb-4 bg-red-500/[0.02] border border-red-500/10 p-3 rounded-xl">
               WARNING: Operations housed within this perimeter manipulate root instances directly. Data destruction cycles triggered cannot be bypassed or pulled back post execution.
             </p>
@@ -625,11 +577,9 @@ export default function CipherGuardSettings() {
                 Clear All Threat Reports
               </button>
               <button onClick={() => triggerModal("killSessions")} className="w-full text-center border border-gray-900 bg-gray-950 hover:bg-gray-900 rounded-xl py-2.5 font-bold tracking-wide text-gray-300 transition-all cursor-pointer">
-                Logout All Device Clusters
+                Logout
               </button>
-              <button onClick={() => triggerModal("resetConfig")} className="w-full text-center border border-gray-900 bg-gray-950 hover:bg-gray-900 rounded-xl py-2.5 font-bold tracking-wide text-gray-300 transition-all cursor-pointer">
-                Reset App Configurations
-              </button>
+             
               <button onClick={() => triggerModal("terminateAccount")} className="w-full text-center bg-red-600 hover:bg-red-500 rounded-xl py-2.5 font-bold tracking-wide text-[#050816] transition-all cursor-pointer shadow-lg shadow-red-500/5">
                 Terminate Master Account
               </button>
