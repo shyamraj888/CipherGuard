@@ -13,8 +13,10 @@ interface NewsArticle {
   title: string;
   description: string;
   url: string;
-  image?: string;
-  source: string;
+  urlToImage?: string;
+  source: {
+    name: string;
+  };
   publishedAt: string;
 }
 
@@ -25,7 +27,7 @@ export default function LiveCyberFeed() {
   async function fetchNews() {
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/news`
+        "http://localhost:5000/api/news"
       );
 
       const data = await res.json();
@@ -80,8 +82,8 @@ export default function LiveCyberFeed() {
         </div>
       ) : (
         <Marquee
-          speed={45}
-          pauseOnHover
+          speed={28}
+         
           gradient={false}
         >
           {news.map((article, index) => (
@@ -89,9 +91,9 @@ export default function LiveCyberFeed() {
               key={index}
               className="mx-4 w-[380px] rounded-2xl border border-gray-800 bg-[#111827] overflow-hidden shadow-xl hover:border-blue-500/40 transition-all duration-300"
             >
-              {article.image && (
+              {article.urlToImage && (
                 <img
-                  src={article.image}
+                  src={article.urlToImage}
                   alt={article.title}
                   className="h-52 w-full object-cover"
                 />
@@ -102,7 +104,7 @@ export default function LiveCyberFeed() {
                 <div className="flex justify-between items-center mb-4">
 
                   <span className="rounded-full bg-blue-500/10 px-3 py-1 text-xs font-semibold text-blue-400">
-                    {article.source}
+                    {article.source.name}
                   </span>
 
                   <Newspaper className="h-5 w-5 text-blue-400" />

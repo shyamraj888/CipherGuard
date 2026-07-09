@@ -46,9 +46,9 @@ export default function CipherGuardPremiumLandingPage() {
       <main className="relative z-10 space-y-4 gap-y-12">
         <Hero />
         <TrustStats />
+         <LiveCyberFeed />
         <Features />
         <HowItWorks />
-        <LiveCyberFeed />
         <Testimonials />
         <CTA />
       </main>
@@ -112,7 +112,7 @@ function Navbar() {
           </div>
 
           <div className="hidden md:flex items-center gap-4">
-            <button className="text-sm font-medium text-gray-300 hover:text-white transition-colors cursor-pointer">
+            <button className="text-sm font-medium text-gray-300 hover:text-white transition-colors cursor-pointer" onClick={() => (window.location.href = "/signin")}>
               Login
             </button>
             <button className="relative group overflow-hidden rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-blue-600/20 transition-all hover:bg-blue-500 hover:shadow-blue-600/30 active:scale-95 cursor-pointer">
@@ -207,8 +207,8 @@ function Hero() {
             Scan Now
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
           </a>
-          <a href="#features" className="rounded-md border border-gray-800 bg-gray-900/40 px-6 py-3.5 text-sm font-semibold text-gray-300 transition-all hover:bg-gray-900 hover:text-white hover:border-gray-700">
-            Learn More
+          <a href="/dashboard" className="rounded-md border border-gray-800 bg-blue-900/40 px-6 py-3.5 text-sm font-semibold text-gray-300 transition-all hover:bg-gray-900 hover:text-white hover:border-gray-700">
+            Your DashBoard
           </a>
         </motion.div>
       </div>

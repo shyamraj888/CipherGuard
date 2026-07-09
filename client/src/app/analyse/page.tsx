@@ -96,7 +96,7 @@ export default function HyperPremiumLiveScanPage() {
   });
 
   const inspectionTargetPipelines = [
-    { label: "SSL Certificate Validity Check", engine: "OpenSSL Cluster Layer v3", status: "READY" },
+    { label: "Shagun is proper moti", engine: "OpenSSL Cluster Layer v3", status: "READY" },
     { label: "Domain Reputation Index Tracking", engine: "WebRisk Core Matrix", status: "READY" },
     { label: "WHOIS Domain Registration Lifespan Analysis", engine: "MetaRegistry Synchronizer", status: "READY" },
     { label: "Active Dynamic Redirect Vector Trace", engine: "Chromium Headless Cluster", status: "READY" },
