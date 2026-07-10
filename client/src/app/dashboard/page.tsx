@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import CipherGuardLogo from "../components/CipherGuardLogo";
 import {
   ResponsiveContainer,
   AreaChart,
@@ -16,7 +17,6 @@ import {
   Cell
 } from "recharts";
 import {
-  Shield,
   Activity,
   Cpu,
   Lock,
@@ -36,6 +36,7 @@ import {
   LogOut,
   Mail,
   QrCode,
+  Shield,
   Image as ImageIcon,
   Info,
   Menu,
@@ -98,14 +99,7 @@ export default function CipherGuardEnterpriseDashboard() {
       {/* DESKTOP SIDEBAR */}
       <aside className="w-64 border-r border-gray-900/80 bg-[#080d22]/40 backdrop-blur-xl flex flex-col justify-between hidden lg:flex shrink-0 relative z-20">
         <div className="p-6 space-y-8">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 shadow-lg shadow-cyan-500/20">
-              <Shield className="h-5 w-5 text-[#050816] stroke-[2.5]" />
-            </div>
-            <span className="text-lg font-black tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-200 to-gray-400 font-mono">
-              CIPHER<span className="text-cyan-400">GUARD</span>
-            </span>
-          </div>
+          <CipherGuardLogo />
 
           <nav className="space-y-1.5">
             {navigationItems.map((item) => {

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useInView } from "framer-motion";
+import CipherGuardLogo from "../components/CipherGuardLogo";
 import { 
   Shield, 
   Menu, 
@@ -99,15 +100,7 @@ function Navbar() {
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-12 items-center justify-between">
-          <div className="flex items-center gap-2.5 cursor-pointer group">
-            <div className="relative">
-              <Shield className="h-6 w-6 text-blue-500 relative z-10 transition-transform duration-500 group-hover:rotate-12" fill="rgba(37, 99, 235, 0.1)" />
-              <div className="absolute -inset-1 bg-blue-500/30 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            </div>
-            <span className="text-lg font-bold tracking-tight text-white">
-              Cipher<span className="text-blue-500 transition-colors group-hover:text-blue-400">Guard</span>
-            </span>
-          </div>
+          <CipherGuardLogo />
 
           <div className="hidden md:flex items-center gap-8">
             {navLinks.map((link) => (

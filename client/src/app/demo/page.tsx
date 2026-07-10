@@ -2,9 +2,10 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useInView } from "framer-motion";
-import LiveCyberFeed from "./components/LiveCyberFeed";
-import CipherGuardLogo from "./components/CipherGuardLogo";
+import CipherGuardLogo from "../components/CipherGuardLogo";
+
 import { 
+  Shield, 
   Menu, 
   X, 
   ShieldCheck, 
@@ -21,7 +22,6 @@ import {
   ShieldAlert, 
   FileText,
   Search,
-  Shield,
   Loader2,
   CheckCircle2,
   Terminal,
@@ -47,7 +47,7 @@ export default function CipherGuardPremiumLandingPage() {
       <main className="relative z-10 space-y-4 gap-y-12">
         <Hero />
         <TrustStats />
-         <LiveCyberFeed />
+        
         <Features />
         <HowItWorks />
         <Testimonials />
@@ -72,18 +72,18 @@ function Navbar() {
   }, []);
 
   const navLinks = [
-    { name: "Home", href: "#" },
-    { name: "Features", href: "#features" },
-    { name: "How It Works", href: "#how-it-works" },
-    { name: "Live Demo", href: "#demo" },
-    { name: "Testimonials", href: "#testimonials" },
+    { name: "Home", href: "/signin" },
+    { name: "Features", href: "/signin" },
+    { name: "How It Works", href: "/signin" },
+    { name: "Live Demo", href: "/signin" },
+    { name: "Testimonials", href: "/signin" },
   ];
 
   return (
-   <motion.nav 
+    <motion.nav 
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      className ={`sticky top-0 z-50 w-full border-b transition-all duration-300 ${
+      className={`sticky top-0 z-50 w-full border-b transition-all duration-300 ${
         scrolled ? "border-gray-800/80 bg-[#0B1120]/80 backdrop-blur-md py-3" : "border-transparent bg-transparent py-5"
       }`}
     >
@@ -105,10 +105,12 @@ function Navbar() {
           </div>
 
           <div className="hidden md:flex items-center gap-4">
-           
-            <button className="relative group overflow-hidden rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-blue-600/20 transition-all hover:bg-blue-500 hover:shadow-blue-600/30 active:scale-95 cursor-pointer" onClick={() => (window.location.href = "/profile")}>
+            <button className="text-sm font-medium text-gray-300 hover:text-white transition-colors cursor-pointer" onClick={() => (window.location.href = "/signin")}>
+              Login
+            </button>
+            <button className="relative group overflow-hidden rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-blue-600/20 transition-all hover:bg-blue-500 hover:shadow-blue-600/30 active:scale-95 cursor-pointer" onClick={() => (window.location.href = "/signin")}>
               <span className="absolute inset-0 bg-white/10 translate-y-full transition-transform duration-300 group-hover:translate-y-0" />
-              User Profile
+              Get Started
             </button>
           </div>
 
@@ -140,9 +142,11 @@ function Navbar() {
                 </a>
               ))}
               <div className="pt-4 border-t border-gray-800 flex flex-col gap-3">
-               
-                <button className="w-full rounded-md bg-blue-600 py-2 text-sm font-medium text-white shadow-md" onClick={() => (window.location.href = "/profile")}>
-                  User Profile
+                <button className="w-full text-center py-2 text-sm font-medium text-gray-300 hover:text-white" onClick={() => (window.location.href = "/signin")}>
+                  Login
+                </button>
+                <button className="w-full rounded-md bg-blue-600 py-2 text-sm font-medium text-white shadow-md" onClick={() => (window.location.href = "/signin")}>
+                  Get Started
                 </button>
               </div>
             </div>
@@ -196,11 +200,11 @@ function Hero() {
           transition={{ delay: 0.3, duration: 0.5 }}
           className="flex flex-wrap gap-4 pt-2"
         >
-          <a href="/analyse" className="group relative flex items-center gap-2 rounded-md bg-blue-600 px-6 py-3.5 text-sm font-semibold text-white shadow-xl shadow-blue-600/20 transition-all hover:bg-blue-500 hover:shadow-blue-600/30 active:scale-98">
+          <a href="/signin" className="group relative flex items-center gap-2 rounded-md bg-blue-600 px-6 py-3.5 text-sm font-semibold text-white shadow-xl shadow-blue-600/20 transition-all hover:bg-blue-500 hover:shadow-blue-600/30 active:scale-98">
             <span>Scan Now</span>
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
           </a>
-          <a href="/dashboard" className="rounded-md border border-gray-800 bg-blue-900/40 px-6 py-3.5 text-sm font-semibold text-gray-300 transition-all hover:bg-gray-900 hover:text-white hover:border-gray-700">
+          <a href="/signin" className="rounded-md border border-gray-800 bg-blue-900/40 px-6 py-3.5 text-sm font-semibold text-gray-300 transition-all hover:bg-gray-900 hover:text-white hover:border-gray-700">
             Your DashBoard
           </a>
         </motion.div>
@@ -460,7 +464,7 @@ function HowItWorks() {
 // ============================================================================
 // 6. LIVE DEMO EXPERIENCE INTERFACE (PREMIUM LIVE STREAM UPDATER)
 // ============================================================================
- <LiveCyberFeed />
+
 
 // ============================================================================
 // 7. TESTIMONIALS ARCHITECTURE
@@ -522,7 +526,7 @@ function CTA() {
           Start protecting yourself today against malicious attacks, scam messages, fake QR codes, and decentralized credentials compromise.
         </p>
         <div className="pt-2">
-          <button className="relative group overflow-hidden rounded-md bg-blue-600 px-7 py-3 text-sm font-semibold text-white shadow-xl shadow-blue-600/20 transition-all hover:bg-blue-500 active:scale-95 cursor-pointer">
+          <button className="relative group overflow-hidden rounded-md bg-blue-600 px-7 py-3 text-sm font-semibold text-white shadow-xl shadow-blue-600/20 transition-all hover:bg-blue-500 active:scale-95 cursor-pointer" onClick={() => (window.location.href = "/signin")}>
             <span className="absolute inset-0 bg-white/10 translate-y-full transition-transform duration-300 group-hover:translate-y-0" />
             Start Free Scan
           </button>

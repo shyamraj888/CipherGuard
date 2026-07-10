@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import CipherGuardLogo from "../components/CipherGuardLogo";
 import {
-  Shield,
   Mail,
   Lock,
   Eye,
@@ -143,18 +143,7 @@ export default function CipherGuardLoginPage() {
           animate={{ opacity: 1, y: 0 }}
           className="flex items-center justify-center gap-2.5 mb-6"
         >
-          <div className="relative">
-            <motion.div
-              animate={{ scale: [1, 1.3, 1], opacity: [0.5, 0, 0.5] }}
-              transition={{ repeat: Infinity, duration: 2.5, ease: "easeOut" }}
-              className="absolute -inset-2 rounded-full border border-blue-500/40"
-            />
-            <Shield className="h-7 w-7 text-blue-500 relative z-10" fill="rgba(37, 99, 235, 0.15)" />
-            <div className="absolute -inset-1 bg-blue-500/30 rounded-full blur-md opacity-60" />
-          </div>
-          <span className="text-xl font-bold tracking-tight text-white">
-            Cipher<span className="text-blue-500">Guard</span>
-          </span>
+          <CipherGuardLogo wrapperClassName="flex items-center justify-center gap-2.5 mb-6" />
         </motion.div>
 
         <div className="flex items-center justify-center gap-2 mb-6 h-4 overflow-hidden">
