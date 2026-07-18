@@ -165,13 +165,72 @@ export default function HyperPremiumLiveScanPage() {
     return () => clearInterval(loggingInterval);
   }, [isScanning]);
 
-  const triggerAdvancedSecureScan = (e: React.FormEvent) => {
+const triggerAdvancedSecureScan = async (e: React.FormEvent) => {
+
     e.preventDefault();
+
     setIsScanning(true);
-    setTimeout(() => {
-      setIsScanning(false);
-    }, 4300);
-  };
+
+    try {
+
+        const data = new FormData();
+
+        if (activeTab === "url") {
+
+            data.append("url", formData.url);
+
+        }
+
+        else if (activeTab === "message") {
+
+            data.append("message", formData.message);
+
+        }
+
+        else if (activeTab === "email") {
+
+            if (formData.emailText)
+                data.append("emailText", formData.emailText);
+
+            if (formData.emailFile)
+                data.append("emailFile", formData.emailFile);
+
+        }
+
+        else if (activeTab === "screenshot") {
+
+            if (formData.screenshot)
+                data.append("image", formData.screenshot);
+
+        }
+
+        const response = await fetch(
+            "http://localhost:5000/api/scan",
+            {
+                method: "POST",
+                body: data
+            }
+        );
+
+        const result = await response.json();
+
+        console.log(result);
+
+    }
+
+    catch (err) {
+
+        console.log(err);
+
+    }
+
+    finally {
+
+        setIsScanning(false);
+
+    }
+
+};
 
  
 
