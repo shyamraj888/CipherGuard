@@ -1,7 +1,10 @@
 const Tesseract = require("tesseract.js");
+const extractUrls = require("../utils/extractUrls");
+const keywordChecker = require("../utils/keywordcheck");
+const checkUrl = require("../services/safeBrowsingService");
+const checkVirusTotal = require("../services/virusTotalService");
 
 const scanController = async (req, res) => {
-
     try {
 
         console.log("BODY:");
@@ -10,93 +13,151 @@ const scanController = async (req, res) => {
         console.log("FILES:");
         console.log(req.files);
 
+        let text = "";
+        let inputType = "";
+
+        // =========================
         // URL
+        // =========================
         if (req.body.url) {
-
-            return res.json({
-                success: true,
-                type: "url",
-                data: req.body.url
-            });
-
+            text = req.body.url;
+            inputType = "url";
         }
 
+        // =========================
         // WhatsApp Message
-        if (req.body.message) {
-
-            return res.json({
-                success: true,
-                type: "message",
-                data: req.body.message
-            });
-
+        // =========================
+        else if (req.body.message) {
+            text = req.body.message;
+            inputType = "message";
         }
 
+        // =========================
         // Email Text
-        if (req.body.emailText) {
+        // =========================
+        else if (req.body.emailText) {
+            text = req.body.emailText;
+            inputType = "email-text";
+        }
 
-            return res.json({
-                success: true,
-                type: "email-text",
-                data: req.body.emailText
-            });
+        // =========================
+        // Email File (.eml)
+        // =========================
+        else if (req.files?.emailFile) {
+
+            // Later you'll parse the .eml file
+            text = "Email file uploaded.";
+            inputType = "email-file";
 
         }
 
-        // Email File
-        if (req.files && req.files.emailFile) {
-
-            return res.json({
-                success: true,
-                type: "email-file",
-                file: req.files.emailFile[0]
-            });
-
-        }
-
+        // =========================
         // Image OCR
-        if (req.files && req.files.image) {
+        // =========================
+        else if (req.files?.image) {
 
             const image = req.files.image[0];
+
+            console.log("Running OCR...");
 
             const result = await Tesseract.recognize(
                 image.path,
                 "eng"
             );
 
-            return res.json({
+            text = result.data.text;
+            inputType = "image";
 
-                success: true,
-
-                type: "image",
-
-                extractedText: result.data.text
-
-            });
-
+            console.log("OCR Finished");
+            console.log(text);
         }
 
-        return res.status(400).json({
-            success: false,
-            message: "Nothing received."
+        else {
+            return res.status(400).json({
+                success: false,
+                message: "Nothing received."
+            });
+        }
+
+        // =====================================
+        // STEP 1 : Extract URLs
+        // =====================================
+
+        const urls = extractUrls(text);
+        let safeBrowsingResults = [];
+
+for (const url of urls) {
+
+    const result = await checkUrl(url);
+
+    safeBrowsingResults.push({
+        url,
+        ...result
+    });
+
+}
+
+const virusTotalResults = [];
+
+for (const url of urls) {
+
+    const result = await checkVirusTotal(url);
+
+    virusTotalResults.push({
+        url,
+        ...result
+    });
+
+}
+        const detectedKeywords = keywordChecker(text);
+
+console.log(detectedKeywords);
+
+        console.log("Extracted URLs:");
+        console.log(urls);
+
+        // =====================================
+        // STEP 2 : Keyword Detection
+        // (Coming Next)
+        // =====================================
+
+        // const keywords = keywordChecker(text);
+
+        // =====================================
+        // STEP 3 : VirusTotal
+        // (Coming Next)
+        // =====================================
+
+        // =====================================
+        // STEP 4 : Google Safe Browsing
+        // (Coming Next)
+        // =====================================
+
+        // =====================================
+        // STEP 5 : Gemini AI
+        // (Coming Next)
+        // =====================================
+
+        return res.json({
+            success: true,
+            type: inputType,
+            extractedText: text,
+            extractedUrls: urls,
+            detectedKeywords: detectedKeywords,
+            safeBrowsingResults: safeBrowsingResults,
         });
 
     }
-
     catch (err) {
 
         console.log(err);
 
         return res.status(500).json({
-
             success: false,
-
             message: err.message
-
         });
 
     }
-
 };
 
 module.exports = {
