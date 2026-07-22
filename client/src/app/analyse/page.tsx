@@ -260,7 +260,7 @@ if (
 
         else{
            const response = await fetch(
-            "http://localhost:5000/api/scan",
+            "https://cipherguard-n2ye.onrender.com/api/scan",
             {
                 method: "POST",
                 body: data
