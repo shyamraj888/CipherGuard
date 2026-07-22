@@ -27,7 +27,7 @@ export default function LiveCyberFeed() {
   async function fetchNews() {
     try {
       const res = await fetch(
-        "http://localhost:5000/api/news"
+        "https://cipherguard-n2ye.onrender.com/api/news"
       );
 
       const data = await res.json();
