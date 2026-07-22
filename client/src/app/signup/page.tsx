@@ -92,7 +92,7 @@ export default function CipherGuardSignupPage() {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (isLoading) return;
     setIsLoading(true);
@@ -107,6 +107,23 @@ export default function CipherGuardSignupPage() {
         return prev + 1;
       });
     }, 550);
+
+    const response = await fetch("http://localhost:5000/api/auth/signup", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ name, email, password })
+    });
+
+    if (!response.ok) {
+      console.error("Signup failed");
+    }
+
+
+
+
+
   };
 
   return (

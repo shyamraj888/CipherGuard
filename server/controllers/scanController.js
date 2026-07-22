@@ -3,6 +3,10 @@ const extractUrls = require("../utils/extractUrls");
 const keywordChecker = require("../utils/keywordcheck");
 const checkUrl = require("../services/safeBrowsingService");
 const checkVirusTotal = require("../services/virusTotalService");
+const checkWhois = require("../services/whoisService");
+const checkSSL = require("../services/sslServices");
+const calculateRisk = require("../services/riskCalculator");
+const { parse } = require("tldts");
 
 const scanController = async (req, res) => {
     try {
@@ -109,6 +113,42 @@ for (const url of urls) {
     });
 
 }
+
+const WhoisResults = [];
+
+for (const url of urls) {
+    const domain = parse(url).domain;
+
+    const final = await checkWhois(domain);
+
+    WhoisResults.push({
+        url,
+        ...final
+    });
+
+}
+
+const sslResults = [];
+
+for (const url of urls) {
+
+    const ssl = await checkSSL(url);
+
+    sslResults.push({
+
+        url,
+
+        ...ssl
+
+    });
+
+}
+console.log("SSL Results:");
+console.log(sslResults);
+  
+  
+
+    
         const detectedKeywords = keywordChecker(text);
 
 console.log(detectedKeywords);
@@ -132,7 +172,37 @@ console.log(detectedKeywords);
         // STEP 4 : Google Safe Browsing
         // (Coming Next)
         // =====================================
+let riskReports = [];
 
+for (let i = 0; i < urls.length; i++) {
+
+    const report = calculateRisk({
+
+        url: urls[i],
+
+        keywords: detectedKeywords,
+
+        safeBrowsing: safeBrowsingResults[i],
+
+        virusTotal: virusTotalResults[i],
+
+        whois: WhoisResults[i],
+
+        ssl: sslResults[i]
+
+    });
+
+    riskReports.push({
+
+        url: urls[i],
+
+        ...report
+
+    });
+    console.log("Risk Report for URL:", urls[i]);
+    console.log(report);
+
+}
         // =====================================
         // STEP 5 : Gemini AI
         // (Coming Next)
@@ -145,6 +215,11 @@ console.log(detectedKeywords);
             extractedUrls: urls,
             detectedKeywords: detectedKeywords,
             safeBrowsingResults: safeBrowsingResults,
+            virusTotalResults: virusTotalResults,
+            WhoisResults: WhoisResults,
+            sslResults: sslResults,
+            riskReports: riskReports
+
         });
 
     }

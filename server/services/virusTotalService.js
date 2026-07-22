@@ -1,11 +1,13 @@
 const axios = require("axios");
-
+const dotenv = require("dotenv");
+require("dotenv").config();
 const API_KEY = process.env.VT_API_KEY;
 
 async function checkVirusTotal(url) {
     try {
 
         // STEP 1: Submit URL
+        console.log("VT API KEY:", process.env.VT_API_KEY);
         const submitResponse = await axios.post(
             "https://www.virustotal.com/api/v3/urls",
             new URLSearchParams({

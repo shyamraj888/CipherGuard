@@ -1,4 +1,6 @@
 const axios = require("axios");
+const dotenv = require("dotenv");
+require("dotenv").config();
 
 const API_KEY = process.env.SAFE_API_KEY;
 

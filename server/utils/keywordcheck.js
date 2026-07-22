@@ -30,7 +30,27 @@ const keywords = [
     "offer",
     "bitcoin",
     "crypto",
-    "wallet"
+    "wallet",
+      "urgent",
+    "immediately",
+    "last day",
+    "today only",
+    "only today",
+    "only 1 hour",
+    "limited time",
+    "expires today",
+    "final call",
+    "act now",
+    "don't miss",
+    "before 11:59",
+    "hurry",
+    "deadline",
+    "registration closes",
+    "offer ends",
+    "few seats left",
+    "last chance",
+    "only few spots",
+    "time running out"
 ];
 
 function keywordChecker(text) {

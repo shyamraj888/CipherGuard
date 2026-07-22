@@ -1,11 +1,24 @@
 require("dotenv").config();
 
-const checkWhois = require("./services/safeBrowsingService");
+const sendOTPEmail = require("./services/emailService");
 
 (async()=>{
 
-    const result = await checkWhois("https://testsafebrowsing.appspot.com/s/phishing.html");
+    try{
 
-    console.log(result);
+        await sendOTPEmail(
+            "fantasticfunfair@gmail.com",
+            "654321"
+        );
+
+        console.log("Done");
+
+    }
+
+    catch(err){
+
+        console.log(err);
+
+    }
 
 })();

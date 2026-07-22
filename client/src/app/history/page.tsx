@@ -42,6 +42,7 @@ import {
   ExternalLink
 } from "lucide-react";
 import CipherGuardLogo from "../components/CipherGuardLogo";
+import { navigate } from "next/dist/client/components/segment-cache/navigation";
 
 // Mock chronological metrics for historical trend analysis
 const historicalTimelineData = [
@@ -285,7 +286,7 @@ export default function CipherGuardScanHistoryDashboard() {
                     <span className="text-[10px] text-cyan-400/80 font-mono">Security Officer</span>
                   </div>
                 </div>
-                <button className="w-full flex items-center justify-center gap-2 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold font-mono">
+                <button className="w-full flex items-center justify-center gap-2 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold font-mono" >
                   <LogOut className="h-4 w-4" />
                   <span>Terminate Session (Logout)</span>
                 </button>

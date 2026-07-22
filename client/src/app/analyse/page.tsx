@@ -1,5 +1,5 @@
 "use client";
-
+import { useRouter } from "next/navigation";
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useMotionTemplate, useMotionValue } from "framer-motion";
 import CipherGuardLogo from "../components/CipherGuardLogo";
@@ -58,7 +58,8 @@ export default function HyperPremiumLiveScanPage() {
   const [scanProgress, setScanProgress] = useState(0);
   const [particles, setParticles] = useState<Particle[]>([]);
   const [systemStatus, setSystemStatus] = useState("OPTIMAL");
-  
+  const router = useRouter();
+  const [check,setCheck] = useState(true);
 
   // Dynamic Mouse Spotlight Glow Effect for Premium Card Interactivity
   const mouseX = useMotionValue(0);
@@ -120,16 +121,43 @@ export default function HyperPremiumLiveScanPage() {
     emailFile: null,
   });
 
-  const inspectionTargetPipelines = [
-  
-    { label: "Domain Reputation Index Tracking", engine: "WebRisk Core Matrix", status: "READY" },
-    { label: "WHOIS Domain Registration Lifespan Analysis", engine: "MetaRegistry Synchronizer", status: "READY" },
-    { label: "Active Dynamic Redirect Vector Trace", engine: "Chromium Headless Cluster", status: "READY" },
-    { label: "Heuristic URL Token Structure Profiling", engine: "Semantic Pattern Compiler", status: "READY" },
-    { label: "Deep OCR Visual Character Extraction", engine: "Vision Neural Pipeline", status: "READY" },
-    { label: "Embedded Payload QR Code Ingestion", engine: "ZBar Grid Analyzer", status: "READY" },
-    { label: "Decentralized Community Threat Intelligence Sync", engine: "AlienVault / VT Database", status: "READY" },
-  ];
+ const inspectionTargetPipelines = [
+  {
+    label: "Optical Character Recognition (OCR)",
+    engine: "Tesseract.js OCR Engine",
+    status: "READY",
+  },
+  {
+    label: "URL & Domain Extraction",
+    engine: "Regex + URL Parser",
+    status: "READY",
+  },
+  {
+    label: "Google Safe Browsing Verification",
+    engine: "Google Safe Browsing API",
+    status: "READY",
+  },
+  {
+    label: "Virus & Phishing Reputation Scan",
+    engine: "VirusTotal Intelligence API",
+    status: "READY",
+  },
+  {
+    label: "WHOIS Domain Registration Analysis",
+    engine: "WhoisXML API",
+    status: "READY",
+  },
+  {
+    label: "Keyword-Based Scam Detection",
+    engine: "CipherGuard Rule Engine",
+    status: "READY",
+  },
+  {
+    label: "AI Threat Explanation",
+    engine: "Google Gemini AI",
+    status: "READY",
+  },
+];
 
   // Dynamic Live Terminal Log Stepper
   useEffect(() => {
@@ -155,7 +183,7 @@ export default function HyperPremiumLiveScanPage() {
     const loggingInterval = setInterval(() => {
       if (currentLogPointer < telemetryLogsTimeline.length) {
         setTerminalLogs(prev => [...prev, `[INIT_NODE_${currentLogPointer * 11}]: ${telemetryLogsTimeline[currentLogPointer]}`]);
-        setScanProgress(Math.floor(((currentLogPointer + 1) / telemetryLogsTimeline.length) * 100));
+        setScanProgress(9*(currentLogPointer + 1));
         currentLogPointer++;
       } else {
         clearInterval(loggingInterval);
@@ -203,8 +231,35 @@ const triggerAdvancedSecureScan = async (e: React.FormEvent) => {
                 data.append("image", formData.screenshot);
 
         }
+if (activeTab === "url" && !formData.url.trim()) {
+    alert("Please enter a URL");
+    return;
+}
 
-        const response = await fetch(
+if (activeTab === "message" && !formData.message.trim()) {
+    alert("Please enter a message");
+    return;
+}
+
+if (
+    activeTab === "email" &&
+    !formData.emailText.trim() &&
+    !formData.emailFile
+) {
+    alert("Please enter email text or upload an .eml file");
+    return;
+}
+
+if (
+    activeTab === "screenshot" &&
+    !formData.screenshot
+) {
+    alert("Please upload an image");
+    return;
+}
+
+        else{
+           const response = await fetch(
             "http://localhost:5000/api/scan",
             {
                 method: "POST",
@@ -215,10 +270,19 @@ const triggerAdvancedSecureScan = async (e: React.FormEvent) => {
         const result = await response.json();
 
         console.log(result);
+       sessionStorage.setItem(
+    "scanResult",
+    JSON.stringify(result)
+);
+
+router.push("/result");
 
     }
 
-    catch (err) {
+    
+        }
+
+       catch (err) {
 
         console.log(err);
 
@@ -231,6 +295,8 @@ const triggerAdvancedSecureScan = async (e: React.FormEvent) => {
     }
 
 };
+
+
 
  
 
