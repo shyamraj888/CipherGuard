@@ -167,9 +167,15 @@ const router = useRouter();
 // 2. HERO SECTION & PREMIUM MOCKUP
 // ============================================================================
 function Hero() {
+  const [userData, setUserData] = useState({ name: "User" }); // Default user data
   
-  const user = localStorage.getItem("user");
-  const userData = JSON.parse(user || "{}");
+  useEffect(() => {
+    const user = localStorage.getItem("user");
+
+    if (user) {
+      setUserData(JSON.parse(user));
+    }
+  }, []);
   return (
     <section className="relative mx-auto max-w-7xl px-4 pt-16 pb-20 sm:px-6 lg:px-8 lg:pt-24 flex flex-col lg:flex-row items-center gap-12 z-10">
       <div className="w-full lg:w-1/2 text-left space-y-6">
