@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import CipherGuardLogo from "../components/CipherGuardLogo";
 import {
@@ -37,8 +39,9 @@ export default function CipherGuardLoginPage() {
   const [ticker, setTicker] = useState(0);
   const cardRef = useRef<HTMLDivElement | null>(null);
   const [mouse, setMouse] = useState({ x: 50, y: 50 });
-   
 
+   
+const router = useRouter();
   const scanStages = [
     "Validating credentials...",
     "Checking device fingerprint...",
@@ -80,12 +83,14 @@ export default function CipherGuardLoginPage() {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (isLoading) return;
     setIsLoading(true);
     setScanStage(0);
-    const interval = setInterval(() => {
+    const interval = await setInterval(() => {
       setScanStage((prev) => {
         if (prev >= scanStages.length - 1) {
           clearInterval(interval);
@@ -94,7 +99,48 @@ export default function CipherGuardLoginPage() {
         }
         return prev + 1;
       });
-    }, 550);
+    }, 3000);
+   
+
+     try {
+
+        const response = await fetch(
+            "http://localhost:5000/api/auth/login",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ email, password })
+            }
+        );
+
+        const data = await response.json();
+
+        if (data.success) {
+
+            localStorage.setItem(
+                "user",
+                JSON.stringify(data.user)
+            );
+
+            router.push("/");
+
+        }
+
+        else {
+
+            alert(data.message);
+
+        }
+
+    }
+
+    catch (err) {
+
+        console.log(err);
+
+    }
   };
 
   return (

@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useRouter } from "next/navigation";
 import {
-  Shield,
   Mail,
   Lock,
   User,
@@ -16,11 +16,10 @@ import {
   CheckCircle2,
   Check,
   Radar,
-  Wifi
+  Wifi,
+  ArrowLeft
 } from "lucide-react";
 import CipherGuardLogo from "../components/CipherGuardLogo";
-
-
 
 interface Particle {
   id: number;
@@ -31,6 +30,7 @@ interface Particle {
 }
 
 export default function CipherGuardSignupPage() {
+  const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -40,15 +40,20 @@ export default function CipherGuardSignupPage() {
   const [scanStage, setScanStage] = useState(0);
   const [particles, setParticles] = useState<Particle[]>([]);
   const [ticker, setTicker] = useState(0);
+  const [step, setStep] = useState<"form" | "otp">("form");
+  const [otp, setOtp] = useState<string[]>(["", "", "", "", "", ""]);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [resendTimer, setResendTimer] = useState(0);
   const cardRef = useRef<HTMLDivElement | null>(null);
+  const otpRefs = useRef<Array<HTMLInputElement | null>>([]);
   const [mouse, setMouse] = useState({ x: 50, y: 50 });
 
   const scanStages = [
-    "Creating your account...",
-    "Generating encryption keys...",
-    "Provisioning threat profile...",
-    "Syncing to threat intelligence mesh...",
-    "Account ready"
+    "Preparing secure verification...",
+    "Generating one-time code...",
+    "Dispatching to your inbox...",
+    "Verification ready"
   ];
 
   const tickerFeed = [
@@ -83,6 +88,12 @@ export default function CipherGuardSignupPage() {
     return () => clearInterval(t);
   }, []);
 
+  useEffect(() => {
+    if (resendTimer <= 0) return;
+    const t = setInterval(() => setResendTimer((v) => v - 1), 1000);
+    return () => clearInterval(t);
+  }, [resendTimer]);
+
   const handleCardMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = cardRef.current?.getBoundingClientRect();
     if (!rect) return;
@@ -92,43 +103,155 @@ export default function CipherGuardSignupPage() {
     });
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (isLoading) return;
+  const startScan = (onComplete: () => void | Promise<void>) => {
     setIsLoading(true);
     setScanStage(0);
-    const interval = setInterval(() => {
+    const interval = window.setInterval(() => {
       setScanStage((prev) => {
         if (prev >= scanStages.length - 1) {
-          clearInterval(interval);
-          setTimeout(() => setIsLoading(false), 1100);
+          window.clearInterval(interval);
+          window.setTimeout(() => {
+            void Promise.resolve(onComplete()).finally(() => setIsLoading(false));
+          }, 900);
           return prev;
         }
         return prev + 1;
       });
     }, 550);
+  };
 
-    const response = await fetch("http://localhost:5000/api/auth/signup", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ name, email, password })
-    });
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (isLoading) return;
 
-    if (!response.ok) {
-      console.error("Signup failed");
+    if (!passwordChecks.every((check) => check.pass)) {
+      setError("Password must meet all requirements.");
+      return;
     }
 
+    if (!passwordsMatch) {
+      setError("Passwords do not match.");
+      return;
+    }
+
+    setError("");
+    setSuccess("");
+
+    startScan(async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/auth/send-otp", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || "Unable to send verification code.");
+        }
+
+        setStep("otp");
+        setOtp(["", "", "", "", "", ""]);
+        setResendTimer(30);
+        setSuccess("A 6-digit code was sent to your email.");
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Unable to send verification code.");
+      }
+    });
+  };
+
+  const handleOtpChange = (idx: number, value: string) => {
+    if (!/^\d*$/.test(value)) return;
+    const next = [...otp];
+    next[idx] = value.slice(-1);
+    setOtp(next);
+    if (value && idx < 5) otpRefs.current[idx + 1]?.focus();
+  };
+
+  const handleOtpKeyDown = (idx: number, event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Backspace" && !otp[idx] && idx > 0) {
+      otpRefs.current[idx - 1]?.focus();
+    }
+  };
+
+  const handleOtpSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (isLoading) return;
+
+    const code = otp.join("");
+    if (code.length < 6) {
+      setError("Enter the full 6-digit code.");
+      return;
+    }
+
+    setError("");
+    setSuccess("");
+
+    startScan(async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/auth/verify-otp", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, email, password, otp: code })
+        });
 
 
+        const data = await response.json();
 
+        localStorage.setItem(
+                "user",
+                JSON.stringify(data.user)
+            );
 
+            router.push("/");
+
+        if (!response.ok) {
+          throw new Error(data.message || "Wrong OTP. Please try again.");
+        }
+
+        router.push("/dashboard");
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Wrong OTP. Please try again.");
+      }
+    });
+  };
+
+  const handleResend = async () => {
+    if (resendTimer > 0) return;
+
+    setError("");
+    setSuccess("");
+
+    try {
+      const response = await fetch("http://localhost:5000/api/auth/send-otp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Unable to resend code.");
+      }
+
+      setOtp(["", "", "", "", "", ""]);
+      setResendTimer(30);
+      setSuccess("A fresh verification code has been sent.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to resend code.");
+    }
+  };
+
+  const goBack = () => {
+    setStep("form");
+    setError("");
+    setSuccess("");
   };
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#0B1120] font-sans text-[#F8FAFC] antialiased selection:bg-blue-500/30 selection:text-blue-200 flex items-center justify-center px-4 py-12">
-
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f293714_1px,transparent_1px),linear-gradient(to_bottom,#1f293714_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_30%,#000_60%,transparent_100%)] pointer-events-none" />
 
       <motion.div
@@ -166,7 +289,6 @@ export default function CipherGuardSignupPage() {
       />
 
       <div className="relative z-10 w-full max-w-md">
-
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -224,6 +346,70 @@ export default function CipherGuardSignupPage() {
             <div className="absolute bottom-3 left-3 w-3 h-3 border-b border-l border-blue-500/40 pointer-events-none" />
             <div className="absolute bottom-3 right-3 w-3 h-3 border-b border-r border-blue-500/40 pointer-events-none" />
 
+            <AnimatePresence>
+              {isLoading && (
+                <motion.div
+                  key="scan-overlay"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-5 rounded-[11px] bg-[#0B1120]/92 backdrop-blur-sm"
+                >
+                  <div className="relative flex h-16 w-16 items-center justify-center">
+                    <motion.span
+                      animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.9, 0.5] }}
+                      transition={{ repeat: Infinity, duration: 1.6, ease: "easeInOut" }}
+                      className="absolute inset-0 rounded-full bg-blue-500/15"
+                    />
+                    <motion.span
+                      animate={{ rotate: 360 }}
+                      transition={{ repeat: Infinity, duration: 2.4, ease: "linear" }}
+                      className="absolute inset-0 rounded-full border border-dashed border-blue-500/30"
+                    />
+                    {scanStage >= scanStages.length - 1 ? (
+                      <CheckCircle2 className="relative h-7 w-7 text-emerald-500" />
+                    ) : (
+                      <Fingerprint className="relative h-7 w-7 text-blue-400" />
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-2 px-4 text-center">
+                    {scanStage < scanStages.length - 1 && (
+                      <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin text-blue-400" />
+                    )}
+                    <AnimatePresence mode="wait">
+                      <motion.span
+                        key={scanStage}
+                        initial={{ opacity: 0, y: 6 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -6 }}
+                        transition={{ duration: 0.25 }}
+                        className="text-xs font-mono text-gray-300"
+                      >
+                        {scanStages[scanStage]}
+                      </motion.span>
+                    </AnimatePresence>
+                  </div>
+
+                  <div className="flex items-center gap-1.5">
+                    {scanStages.map((_, idx) => (
+                      <span
+                        key={idx}
+                        className={`h-1 w-6 rounded-full transition-colors duration-300 ${
+                          idx <= scanStage ? "bg-blue-500" : "bg-gray-800"
+                        }`}
+                      />
+                    ))}
+                  </div>
+
+                  <div className="flex items-center gap-1.5 text-[10px] font-mono text-gray-600">
+                    <Activity className="h-3 w-3" />
+                    <span>REGISTER_NODE_SECURE</span>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             <div className="relative flex items-center justify-between border-b border-gray-800 pb-4 mb-6">
               <div className="flex items-center gap-1.5">
                 <span className="h-2.5 w-2.5 rounded-full bg-red-500/70" />
@@ -246,12 +432,39 @@ export default function CipherGuardSignupPage() {
             </div>
 
             <div className="relative space-y-1 mb-6">
-              <h1 className="text-2xl font-bold tracking-tight text-white">Create your account</h1>
-              <p className="text-sm text-gray-400">Join the threat console and start scanning in minutes.</p>
+              <div className="flex items-center gap-2">
+                {step === "otp" && (
+                  <button type="button" onClick={goBack} className="text-gray-400 hover:text-white">
+                    <ArrowLeft className="h-4 w-4" />
+                  </button>
+                )}
+                <div>
+                  <h1 className="text-2xl font-bold tracking-tight text-white">
+                    {step === "otp" ? "Verify your email" : "Create your account"}
+                  </h1>
+                  <p className="text-sm text-gray-400">
+                    {step === "otp"
+                      ? "Enter the 6-digit code sent to your inbox."
+                      : "Join the threat console and start scanning in minutes."}
+                  </p>
+                </div>
+              </div>
             </div>
 
+            {error ? (
+              <div className="mb-4 rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-300">
+                {error}
+              </div>
+            ) : null}
+
+            {success ? (
+              <div className="mb-4 rounded-md border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-300">
+                {success}
+              </div>
+            ) : null}
+
             <AnimatePresence mode="wait">
-              {!isLoading ? (
+              {step === "form" ? (
                 <motion.form
                   key="form"
                   exit={{ opacity: 0, scale: 0.98 }}
@@ -373,7 +586,8 @@ export default function CipherGuardSignupPage() {
 
                   <button
                     type="submit"
-                    className="group relative w-full flex items-center justify-center gap-2 rounded-md bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-xl shadow-blue-600/20 transition-all hover:bg-blue-500 hover:shadow-blue-600/40 active:scale-98 cursor-pointer mt-2 overflow-hidden"
+                    disabled={isLoading}
+                    className="group relative w-full flex items-center justify-center gap-2 rounded-md bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-xl shadow-blue-600/20 transition-all hover:bg-blue-500 hover:shadow-blue-600/40 active:scale-98 cursor-pointer mt-2 overflow-hidden disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-blue-600"
                   >
                     <motion.span
                       animate={{ x: ["-100%", "200%"] }}
@@ -389,63 +603,45 @@ export default function CipherGuardSignupPage() {
                   </p>
                 </motion.form>
               ) : (
-                <motion.div
-                  key="scanning"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="relative py-6"
+                <motion.form
+                  key="otp"
+                  exit={{ opacity: 0, scale: 0.98 }}
+                  onSubmit={handleOtpSubmit}
+                  className="relative space-y-4"
                 >
-                  <div className="flex flex-col items-center gap-4">
-                    <div className="relative flex h-20 w-20 items-center justify-center">
-                      <motion.div
-                        animate={{ scale: [1, 1.5], opacity: [0.6, 0] }}
-                        transition={{ repeat: Infinity, duration: 1.6, ease: "easeOut" }}
-                        className="absolute inset-0 rounded-full border border-blue-500"
+                  <div className="flex justify-center gap-2">
+                    {otp.map((digit, idx) => (
+                      <input
+                        key={idx}
+                        ref={(el) => {
+                          otpRefs.current[idx] = el;
+                        }}
+                        type="text"
+                        inputMode="numeric"
+                        maxLength={1}
+                        value={digit}
+                        onChange={(e) => handleOtpChange(idx, e.target.value)}
+                        onKeyDown={(e) => handleOtpKeyDown(idx, e)}
+                        className="h-12 w-11 rounded-md border border-gray-700 bg-gray-900 text-center text-lg font-semibold text-white outline-none focus:border-blue-500"
                       />
-                      <motion.div
-                        animate={{ scale: [1, 1.5], opacity: [0.6, 0] }}
-                        transition={{ repeat: Infinity, duration: 1.6, ease: "easeOut", delay: 0.5 }}
-                        className="absolute inset-0 rounded-full border border-blue-500"
-                      />
-                      <motion.div
-                        animate={{ rotate: 360 }}
-                        transition={{ repeat: Infinity, duration: 1.2, ease: "linear" }}
-                        className="absolute inset-2 rounded-full border-2 border-gray-800 border-t-blue-500"
-                      />
-                      <Fingerprint className="h-7 w-7 text-blue-500" />
-                    </div>
-
-                    <div className="w-full space-y-2 mt-2">
-                      {scanStages.map((stage, idx) => (
-                        <motion.div
-                          key={idx}
-                          initial={false}
-                          animate={{ opacity: idx <= scanStage ? 1 : 0.2 }}
-                          className="flex items-center gap-2.5 text-xs font-mono"
-                        >
-                          {idx < scanStage || (idx === scanStage && idx === scanStages.length - 1) ? (
-                            <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
-                          ) : idx === scanStage ? (
-                            <Loader2 className="h-3.5 w-3.5 text-blue-500 shrink-0 animate-spin" />
-                          ) : (
-                            <Activity className="h-3.5 w-3.5 text-gray-700 shrink-0" />
-                          )}
-                          <span className={idx === scanStages.length - 1 && idx === scanStage ? "text-emerald-400" : "text-gray-400"}>
-                            {stage}
-                          </span>
-                        </motion.div>
-                      ))}
-                    </div>
-
-                    <div className="w-full h-1 bg-gray-800 rounded-full overflow-hidden mt-1">
-                      <motion.div
-                        className="h-full bg-gradient-to-r from-blue-500 to-emerald-500"
-                        animate={{ width: `${((scanStage + 1) / scanStages.length) * 100}%` }}
-                        transition={{ duration: 0.4 }}
-                      />
-                    </div>
+                    ))}
                   </div>
-                </motion.div>
+
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="group relative w-full flex items-center justify-center gap-2 rounded-md bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-xl shadow-blue-600/20 transition-all hover:bg-blue-500 hover:shadow-blue-600/40 active:scale-98 cursor-pointer mt-2 overflow-hidden disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-blue-600"
+                  >
+                    Verify code
+                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  </button>
+
+                  <div className="text-center text-sm text-gray-400">
+                    <button type="button" onClick={handleResend} disabled={resendTimer > 0 || isLoading} className="text-blue-500 hover:text-blue-400 disabled:text-gray-500">
+                      {resendTimer > 0 ? `Resend code in ${resendTimer}s` : "Resend code"}
+                    </button>
+                  </div>
+                </motion.form>
               )}
             </AnimatePresence>
           </div>

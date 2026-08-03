@@ -7,6 +7,7 @@ const checkWhois = require("../services/whoisService");
 const checkSSL = require("../services/sslServices");
 const calculateRisk = require("../services/riskCalculator");
 const { parse } = require("tldts");
+const Scan = require("../models/Scan");
 
 const scanController = async (req, res) => {
     try {

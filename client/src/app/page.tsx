@@ -4,6 +4,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useInView } from "framer-motion";
 import LiveCyberFeed from "./components/LiveCyberFeed";
 import CipherGuardLogo from "./components/CipherGuardLogo";
+import { useRouter } from "next/navigation";
+
 import { 
   Menu, 
   X, 
@@ -64,12 +66,20 @@ export default function CipherGuardPremiumLandingPage() {
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-
+const router = useRouter();
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
+    
+  const user = localStorage.getItem("user");
+  
+  if (!user) {
+    router.push("/demo"); // Redirect to your sign-in route
+  }
+
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+    
+ } ,[]);
 
   const navLinks = [
     { name: "Home", href: "#" },
@@ -157,6 +167,9 @@ function Navbar() {
 // 2. HERO SECTION & PREMIUM MOCKUP
 // ============================================================================
 function Hero() {
+  
+  const user = localStorage.getItem("user");
+  const userData = JSON.parse(user || "{}");
   return (
     <section className="relative mx-auto max-w-7xl px-4 pt-16 pb-20 sm:px-6 lg:px-8 lg:pt-24 flex flex-col lg:flex-row items-center gap-12 z-10">
       <div className="w-full lg:w-1/2 text-left space-y-6">
@@ -166,13 +179,23 @@ function Hero() {
           className="inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-blue-500/5 px-3 py-1 text-xs font-medium text-blue-400 backdrop-blur-md"
         >
           <Activity className="h-3.5 w-3.5 animate-pulse" />
-          <span>v3.1 Predictive Threat Analytics Matrix Active</span>
+          <span></span>
         </motion.div>
 
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1, duration: 0.5 }}
+          className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl leading-[1.1]"
+        >
+          Welcome {userData.name ? userData.name : "User"}! <br />
+         
+        </motion.h1>
+
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15, duration: 0.5 }}
           className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl leading-[1.1]"
         >
           Detect Phishing <br />

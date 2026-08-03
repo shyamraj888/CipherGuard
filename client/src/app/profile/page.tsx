@@ -120,7 +120,7 @@ function Navbar() {
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               <span className="text-xs font-mono text-gray-400">NODE_AUTH_OK</span>
             </div>
-            <button className="p-2 rounded-md border border-gray-800 text-gray-400 hover:text-red-400 hover:bg-red-500/5 transition-all cursor-pointer">
+            <button onClick={() => { localStorage.removeItem("user"); localStorage.clear(); window.location.href = "/signin"; }} className="p-2 rounded-md border border-gray-800 text-gray-400 hover:text-red-400 hover:bg-red-500/5 transition-all cursor-pointer">
               <LogOut className="h-4 w-4" />
             </button>
           </div>
@@ -171,6 +171,8 @@ function Navbar() {
 // 2. PROFILE HERO HEADER COMPONENT
 // ============================================================================
 function ProfileHeader() {
+  const user = localStorage.getItem("user");
+  const formData = JSON.parse(user || "{}");
   return (
     <section className="relative w-full z-10">
       <motion.div 
@@ -190,7 +192,7 @@ function ProfileHeader() {
             <div className="relative group">
               <div className="h-24 w-24 sm:h-28 sm:w-28 rounded-xl bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-600 p-0.5 shadow-xl shadow-blue-500/10 relative z-10 overflow-hidden">
                 <div className="h-full w-full bg-[#0B1120] rounded-[10px] flex items-center justify-center font-mono text-3xl font-black text-white relative overflow-hidden">
-                  SR
+                  {formData.name ? formData.name.split(" ").map((n: string) => n[0]).join("") : "SG"}
                   <motion.div 
                     animate={{ y: ["-100%", "100%"] }} 
                     transition={{ repeat: Infinity, duration: 2.5, ease: "linear" }}
@@ -206,7 +208,7 @@ function ProfileHeader() {
 
             <div className="space-y-2">
               <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5">
-                <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">Shyam Raja</h1>
+                <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">{formData.name}</h1>
                 <div className="flex items-center gap-1.5 rounded-full border border-blue-500/30 bg-blue-500/5 px-2.5 py-0.5 text-[10px] font-mono font-medium text-blue-400 backdrop-blur-md">
                   <Activity className="h-3 w-3 animate-pulse" />
                   <span>v3.1 Verified Operator</span>
@@ -310,10 +312,10 @@ function StatCard({ item, index }: { item: any; index: number }) {
 // ============================================================================
 function AccountDetails() {
   const [formData, setFormData] = useState({
-    name: "Shyam Raja",
-    username: "shyam_raja",
-    email: "shyam.raja@cipherguard.io",
-    phone: "+91 98765 43210"
+    name: localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user") || "{}").name : "",
+    username: localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user") || "{}").username : "",
+    email: localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user") || "{}").email : "",
+    phone: localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user") || "{}").phone : ""
   });
 
   return (

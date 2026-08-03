@@ -79,7 +79,7 @@ const navigationItems = [
   { label: "Dashboard", ref: "/dashboard", icon: LayoutDashboard },
   { label: "Analyze", ref: "/analyse", icon: Eye },
   { label: "History", ref: "/history", icon: History },
-  { label: "Threat Reports", ref: "/threat-reports", icon: FileText },
+
   { label: "Cyber News", ref: "/", icon: Newspaper },
   { label: "Settings", ref: "/settings", icon: Settings }
 ];
