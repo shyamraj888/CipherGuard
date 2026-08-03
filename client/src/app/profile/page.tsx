@@ -8,7 +8,6 @@ import {
   Menu, 
   X, 
   ShieldCheck, 
-  ArrowRight, 
   Globe, 
   AlertTriangle, 
   Cpu,
@@ -90,6 +89,14 @@ function Navbar() {
     { name: "System Settings", href: "/settings" },
   ];
 
+  const handleLogout = () => {
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("user");
+      localStorage.clear();
+      window.location.href = "/signin";
+    }
+  };
+
   return (
     <motion.nav 
       initial={{ y: -20, opacity: 0 }}
@@ -120,7 +127,7 @@ function Navbar() {
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               <span className="text-xs font-mono text-gray-400">NODE_AUTH_OK</span>
             </div>
-            <button onClick={() => { localStorage.removeItem("user"); localStorage.clear(); window.location.href = "/signin"; }} className="p-2 rounded-md border border-gray-800 text-gray-400 hover:text-red-400 hover:bg-red-500/5 transition-all cursor-pointer">
+            <button onClick={handleLogout} className="p-2 rounded-md border border-gray-800 text-gray-400 hover:text-red-400 hover:bg-red-500/5 transition-all cursor-pointer">
               <LogOut className="h-4 w-4" />
             </button>
           </div>
@@ -157,7 +164,7 @@ function Navbar() {
                   <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                   <span className="text-xs font-mono text-gray-400">NODE_AUTH_OK</span>
                 </div>
-                <button className="w-full text-center py-2 text-sm font-medium text-red-400 border border-red-500/10 bg-red-500/5 rounded-md">Disconnect Node</button>
+                <button onClick={handleLogout} className="w-full text-center py-2 text-sm font-medium text-red-400 border border-red-500/10 bg-red-500/5 rounded-md cursor-pointer">Disconnect Node</button>
               </div>
             </div>
           </motion.div>
@@ -171,8 +178,19 @@ function Navbar() {
 // 2. PROFILE HERO HEADER COMPONENT
 // ============================================================================
 function ProfileHeader() {
-  const user = localStorage.getItem("user");
-  const formData = JSON.parse(user || "{}");
+  const [formData, setFormData] = useState<{ name?: string }>({});
+
+  useEffect(() => {
+    const user = localStorage.getItem("user");
+    if (user) {
+      try {
+        setFormData(JSON.parse(user));
+      } catch (err) {
+        console.error("Failed to parse user state:", err);
+      }
+    }
+  }, []);
+
   return (
     <section className="relative w-full z-10">
       <motion.div 
@@ -181,14 +199,12 @@ function ProfileHeader() {
         transition={{ duration: 0.5 }}
         className="rounded-xl border border-gray-800 bg-[#111827]/60 p-6 sm:p-8 shadow-2xl backdrop-blur-xl relative overflow-hidden"
       >
-        {/* Decorative Grid Line flare */}
         <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-blue-500/40 to-transparent" />
         <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-500/10 blur-3xl pointer-events-none rounded-full" />
 
         <div className="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
           
           <div className="flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
-            {/* Animated Avatar Layout */}
             <div className="relative group">
               <div className="h-24 w-24 sm:h-28 sm:w-28 rounded-xl bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-600 p-0.5 shadow-xl shadow-blue-500/10 relative z-10 overflow-hidden">
                 <div className="h-full w-full bg-[#0B1120] rounded-[10px] flex items-center justify-center font-mono text-3xl font-black text-white relative overflow-hidden">
@@ -208,7 +224,7 @@ function ProfileHeader() {
 
             <div className="space-y-2">
               <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5">
-                <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">{formData.name}</h1>
+                <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">{formData.name || "Operator"}</h1>
                 <div className="flex items-center gap-1.5 rounded-full border border-blue-500/30 bg-blue-500/5 px-2.5 py-0.5 text-[10px] font-mono font-medium text-blue-400 backdrop-blur-md">
                   <Activity className="h-3 w-3 animate-pulse" />
                   <span>v3.1 Verified Operator</span>
@@ -312,11 +328,28 @@ function StatCard({ item, index }: { item: any; index: number }) {
 // ============================================================================
 function AccountDetails() {
   const [formData, setFormData] = useState({
-    name: localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user") || "{}").name : "",
-    username: localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user") || "{}").username : "",
-    email: localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user") || "{}").email : "",
-    phone: localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user") || "{}").phone : ""
+    name: "",
+    username: "",
+    email: "",
+    phone: ""
   });
+
+  useEffect(() => {
+    const user = localStorage.getItem("user");
+    if (user) {
+      try {
+        const parsed = JSON.parse(user);
+        setFormData({
+          name: parsed.name || "",
+          username: parsed.username || "",
+          email: parsed.email || "",
+          phone: parsed.phone || ""
+        });
+      } catch (err) {
+        console.error("Failed to parse account details:", err);
+      }
+    }
+  }, []);
 
   return (
     <motion.div
@@ -545,7 +578,6 @@ function LiveActivityTerminal() {
       viewport={{ once: true }}
       className="rounded-xl border border-gray-800 bg-[#111827]/80 p-5 shadow-2xl backdrop-blur-xl relative overflow-hidden h-[460px] flex flex-col justify-between"
     >
-      {/* Absolute underglow behind terminal layout */}
       <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/5 blur-xl pointer-events-none" />
       
       <div>
@@ -566,7 +598,6 @@ function LiveActivityTerminal() {
           Monitor streaming transaction loops, validation telemetry drops, and session handshakes securely below.
         </p>
 
-        {/* Dynamic Log Queue Terminal Grid */}
         <div className="space-y-3 font-mono text-[11px] overflow-hidden">
           <AnimatePresence mode="popLayout">
             {logs.map((log) => (
