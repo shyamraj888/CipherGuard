@@ -139,7 +139,7 @@ export default function CipherGuardSignupPage() {
 
     startScan(async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/auth/send-otp", {
+        const response = await fetch("https://cipherguard-n2ye.onrender.com/api/auth/send-otp", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email })
