@@ -210,7 +210,7 @@ export default function CipherGuardSignupPage() {
           throw new Error(data.message || "Wrong OTP. Please try again.");
         }
 
-        router.push("/dashboard");
+        router.push("/");
       } catch (err) {
         setError(err instanceof Error ? err.message : "Wrong OTP. Please try again.");
       }
